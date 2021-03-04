@@ -1,7 +1,10 @@
 package edu.northwestern.ssa;
 
+import org.archive.io.ArchiveReader;
+import org.archive.io.warc.WARCReaderFactory;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.http.HttpExecuteResponse;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -11,12 +14,13 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Scanner;
 
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         /*
         Download a WARC.
          */
@@ -58,6 +62,26 @@ public class App {
 
         // Close the S3 object.
         s3.close();
+
+        /*
+        Parse the WARC file.
+         */
+
+        // Create an ArchiveReader object.
+        ArchiveReader reader = WARCReaderFactory.get(f);
+
+        // Create a new Elasticsearch index.
+        ElasticSearch es = new ElasticSearch("es");
+        HttpExecuteResponse esIndexResponse = es.createIndex();
+        esIndexResponse.responseBody().get().close();
+
+        // Close the ElasticSearch object.
+        es.close();
+
+        // Delete the downloaded crawl data file.
+        f.deleteOnExit();
+
+        System.out.println("Done.");
     }
 
     private static Boolean isNewCrawlData(String latestKey) {

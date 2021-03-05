@@ -41,11 +41,19 @@ public class Search {
                     .header("Access-Control-Allow-Origin", "*").build();
         }
 
-        JSONArray results = new JSONArray();
-        results.put("hello world!");
-        results.put(q);
+        // Initialize results JSONObject to return.
+        JSONObject results = new JSONObject();
+
+        // If query is blank, then return empty body.
+        if (q.equals("")) {
+            results.put("returned_results", 0);
+            results.put("articles", new JSONArray());
+            results.put("total_results", 0);
+            return Response.status(200).type("application/json").entity(results.toString(4))
+                    .header("Access-Control-Allow-Origin", "*").build();
+        }
+
         return Response.status(200).type("application/json").entity(results.toString(4))
-                // below header is for CORS
                 .header("Access-Control-Allow-Origin", "*").build();
     }
 }

@@ -21,6 +21,26 @@ public class Search {
             @QueryParam("count") String count,
             @QueryParam("offset") String offset
     ) throws IOException {
+        // If query is missing, then return a 400 response.
+        if (q == null) {
+            return Response.status(400).type("application/json").entity("'query' is missing from url.")
+                    .header("Access-Control-Allow-Origin", "*").build();
+        }
+
+        // If count or offset are not integers, then return a 400 response.
+        try {
+            if (count != null) {
+                Integer.parseInt(count);
+            }
+            if (offset != null) {
+                Integer.parseInt(offset);
+            }
+        } catch (Exception e) {
+            String entity = "Invalid number passed as a query parameter to 'offset' or 'count'.";
+            return Response.status(200).type("application/json").entity(entity)
+                    .header("Access-Control-Allow-Origin", "*").build();
+        }
+
         JSONArray results = new JSONArray();
         results.put("hello world!");
         results.put(q);

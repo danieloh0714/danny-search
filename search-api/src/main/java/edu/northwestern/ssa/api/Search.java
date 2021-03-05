@@ -14,7 +14,13 @@ public class Search {
 
     /** when testing, this is reachable at http://localhost:8080/api/search?query=hello */
     @GET
-    public Response getMsg(@QueryParam("query") String q) throws IOException {
+    public Response getMsg(
+            @QueryParam("query") String q,
+            @QueryParam("language") String language,
+            @QueryParam("date") String date,
+            @QueryParam("count") String count,
+            @QueryParam("offset") String offset
+    ) throws IOException {
         JSONArray results = new JSONArray();
         results.put("hello world!");
         results.put(q);

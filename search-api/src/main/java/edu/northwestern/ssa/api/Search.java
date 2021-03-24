@@ -76,6 +76,11 @@ public class Search {
         // Close Elasticsearch instance.
         es.close();
 
+        // Get necessary information from response body.
+        int totalResults = getTotalResults(responseBody);
+
+        results.put("total_results", totalResults);
+
         return Response.status(200).type("application/json").entity(results.toString(4))
                 .header("Access-Control-Allow-Origin", "*").build();
     }
@@ -151,5 +156,11 @@ public class Search {
         } catch (Exception e) {
             return new JSONObject();
         }
+    }
+
+    private static int getTotalResults(JSONObject responseBody) {
+        JSONObject hits = (JSONObject) responseBody.get("hits");
+        JSONObject total = (JSONObject) hits.get("total");
+        return (int) total.get("value");
     }
 }

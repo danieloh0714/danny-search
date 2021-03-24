@@ -79,10 +79,13 @@ public class Search {
         // Get necessary information from response body.
         int totalResults = getTotalResults(responseBody);
         JSONArray articles = getArticles(responseBody);
+        int returnedResults = Math.min(totalResults, articles.length());
 
+        results.put("returned_results", returnedResults);
         results.put("total_results", totalResults);
         results.put("articles", articles);
 
+        // Return response.
         return Response.status(200).type("application/json").entity(results.toString(4))
                 .header("Access-Control-Allow-Origin", "*").build();
     }

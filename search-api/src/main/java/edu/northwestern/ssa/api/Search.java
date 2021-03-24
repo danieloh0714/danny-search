@@ -78,8 +78,10 @@ public class Search {
 
         // Get necessary information from response body.
         int totalResults = getTotalResults(responseBody);
+        JSONArray articles = getArticles(responseBody);
 
         results.put("total_results", totalResults);
+        results.put("articles", articles);
 
         return Response.status(200).type("application/json").entity(results.toString(4))
                 .header("Access-Control-Allow-Origin", "*").build();
@@ -162,5 +164,17 @@ public class Search {
         JSONObject hits = (JSONObject) responseBody.get("hits");
         JSONObject total = (JSONObject) hits.get("total");
         return (int) total.get("value");
+    }
+
+    private static JSONArray getArticles(JSONObject responseBody) {
+        JSONArray articleSources = new JSONArray();
+        JSONObject hits = (JSONObject) responseBody.get("hits");
+        JSONArray articles = (JSONArray) hits.get("hits");
+        for (Object articleObject : articles) {
+            JSONObject article = (JSONObject) articleObject;
+            JSONObject source = (JSONObject) article.get("_source");
+            articleSources.put(source);
+        }
+        return articleSources;
     }
 }
